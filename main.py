@@ -20,30 +20,29 @@ ax.set_ylabel('Valeurs des fonctions')
 ax.set_title('Graphique des fonctions F2480, F2470, F2490')
 ax.legend()
 
-# Ajout du texte pour afficher les valeurs des fonctions
-text = ax.text(0.7, 0.9, '', transform=ax.transAxes)
+# Création de l'annotation pour afficher les valeurs
+annot = ax.annotate("", xy=(0,0), xytext=(20,20), textcoords="offset points",
+                    bbox=dict(boxstyle="round", fc="w"), arrowprops=dict(arrowstyle="->"))
+annot.set_visible(False)
 
-# Fonction pour mettre à jour les valeurs des fonctions en fonction de la position du curseur
-def update_values(event):
+# Fonction pour mettre à jour l'annotation avec les valeurs des fonctions
+def update_annot(event):
     if event.inaxes == ax:
         x_val = event.xdata
-        # Trouver l'index le plus proche de la valeur de x
-        index = np.argmin(np.abs(x - x_val))
-        
-        # Mettre à jour le texte avec les valeurs des fonctions
-        text.set_text(
-            f'x = {x_val:.2f}\n'
-            f'F2480 = {F2480[index]:.2f}\n'
-            f'F2470 = {F2470[index]:.2f}\n'
-            f'F2490 = {F2490[index]:.2f}'
-        )
+        y1 = 2480 + (332 * x_val) / (332 + x_val)
+        y2 = 2470 + (332 * x_val) / (332 + x_val)
+        y3 = 2490 + (332 * x_val) / (332 + x_val)
+        text = f"x={x_val:.2f}\nF2480={y1:.2f}\nF2470={y2:.2f}\nF2490={y3:.2f}"
+        annot.xy = (x_val, y1)
+        annot.set_text(text)
+        annot.set_visible(True)
         fig.canvas.draw_idle()
 
-# Connexion de la fonction de mise à jour à l'événement de mouvement de la souris
-fig.canvas.mpl_connect('motion_notify_event', update_values)
+# Connexion de la fonction à l'événement de mouvement de souris
+fig.canvas.mpl_connect("motion_notify_event", update_annot)
 
-# Ajout d'un curseur
+# Ajout du curseur
 cursor = Cursor(ax, horizOn=True, vertOn=True, useblit=True, color='red', linewidth=1)
 
-# Affiche le graphique
+# Affichage du graphique
 plt.show()
